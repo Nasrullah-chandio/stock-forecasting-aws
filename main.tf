@@ -25,6 +25,16 @@ resource "aws_subnet" "private_subnet" {
     Name = "stock-forecast-private-subnet"
   }
 }
+resource "aws_subnet" "private_subnet_2" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "stock-forecast-private-subnet-2"
+  }
+}
+
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
@@ -49,4 +59,58 @@ resource "aws_route_table" "public_rt" {
 resource "aws_route_table_association" "public_rt_assoc" {
   subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.public_rt.id
+}
+resource "aws_db_subnet_group" "db_subnet_group" {
+  name       = "stock-db-subnet-group"
+  subnet_ids = [
+    aws_subnet.private_subnet.id,
+    aws_subnet.private_subnet_2.id
+  ]
+
+  tags = {
+    Name = "Stock DB Subnet Group"
+  }
+}
+
+resource "aws_security_group" "rds_sg" {
+  name        = "rds-access"
+  description = "Allow app access to PostgreSQL"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "PostgreSQL from anywhere (temporary)"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # ⚠️ You can restrict this later
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "rds-security-group"
+  }
+}
+resource "aws_db_instance" "stock_db" {
+  identifier             = "stock-db"
+  engine                 = "postgres"
+  # engine_version         = "15.2"  # Optional
+  instance_class         = "db.t3.micro"
+  allocated_storage      = 20
+  db_name                = "stocks"
+  username               = "pgadmin"
+  password               = "Passw0rd1234!"
+  skip_final_snapshot    = true
+  publicly_accessible    = false
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
+
+  tags = {
+    Name = "stock-forecast-postgres"
+  }
 }
