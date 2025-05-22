@@ -114,3 +114,38 @@ resource "aws_db_instance" "stock_db" {
     Name = "stock-forecast-postgres"
   }
 }
+resource "aws_instance" "bastion" {
+  ami                    = "ami-0c101f26f147fa7fd"  # Amazon Linux 2 AMI (us-east-1)
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public_subnet.id
+  vpc_security_group_ids = [aws_security_group.bastion_sg.id]
+  key_name               = "bastion-key"  # You'll create this key pair manually or via Terraform
+
+  tags = {
+    Name = "stock-bastion"
+  }
+}
+resource "aws_security_group" "bastion_sg" {
+  name        = "bastion-sg"
+  description = "Allow SSH from your laptop"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["184.147.218.58/32"]  # Replace with your actual public IP (from curl ifconfig.me)
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "bastion-sg"
+  }
+}
+
