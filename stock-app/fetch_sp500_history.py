@@ -1,9 +1,9 @@
-import yfinance as yf
+from alpha_vantage.timeseries import TimeSeries
 import psycopg2
 
 # Connect to RDS
 conn = psycopg2.connect(
-    host="stock-db.cwftb99aibcq.us-east-1.rds.amazonaws.com",
+    host="10.0.3.198",
     dbname="stocks",
     user="pgadmin",
     password="Passw0rd1234!",
@@ -11,33 +11,33 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 
-# Create table if it doesn't exist
+# Create table
 cur.execute("""
-    CREATE TABLE IF NOT EXISTS stock_prices (
-        id SERIAL PRIMARY KEY,
-        symbol VARCHAR(10),
-        price FLOAT,
-        date DATE
-    );
+    CREATE TABLE IF NOT EXISTS aapl_prices (
+        date DATE PRIMARY KEY,
+        open NUMERIC,
+        high NUMERIC,
+        low NUMERIC,
+        close NUMERIC,
+        volume BIGINT
+    )
 """)
 conn.commit()
 
-# Fetch historical data
-symbol = '^GSPC'
-print(f"📈 Fetching historical data for {symbol}...")
-data = yf.download(symbol, start="2015-01-01", end="2025-05-21", interval='1d')
+# Fetch data from Alpha Vantage
+ts = TimeSeries(key="YOUR_API_KEY", output_format='pandas')
+data, meta = ts.get_daily(symbol='AAPL', outputsize='full')
 
-inserted = 0
+# Insert into DB
 for date, row in data.iterrows():
     cur.execute("""
-        INSERT INTO stock_prices (symbol, price, date)
-        VALUES (%s, %s, %s)
-        ON CONFLICT DO NOTHING;
-    """, (symbol, row['Close'], date.date()))
-    inserted += 1
+        INSERT INTO aapl_prices (date, open, high, low, close, volume)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (date) DO NOTHING
+    """, (date.date(), row['1. open'], row['2. high'], row['3. low'], row['4. close'], int(row['5. volume'])))
 
 conn.commit()
 cur.close()
 conn.close()
 
-print(f"✅ Done. Inserted {inserted} rows into RDS.")
+print("✅ Done. AAPL data inserted.")
