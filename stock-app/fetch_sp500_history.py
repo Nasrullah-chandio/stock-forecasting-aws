@@ -1,13 +1,18 @@
 from alpha_vantage.timeseries import TimeSeries
 import psycopg2
+import os
+from dotenv import load_dotenv
 
-# Connect to RDS
+# Load environment variables from .env file
+load_dotenv()
+
+# Connect to RDS using values from .env
 conn = psycopg2.connect(
-    host="10.0.3.198",
-    dbname="stocks",
-    user="pgadmin",
-    password="Passw0rd1234!",
-    port=5432
+    host=os.getenv("DB_HOST"),
+    dbname=os.getenv("DB_NAME"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    port=os.getenv("DB_PORT")
 )
 cur = conn.cursor()
 
@@ -25,7 +30,7 @@ cur.execute("""
 conn.commit()
 
 # Fetch data from Alpha Vantage
-ts = TimeSeries(key="YOUR_API_KEY", output_format='pandas')
+ts = TimeSeries(key="6DPS4R2VJXY5ZOWE", output_format='pandas')
 data, meta = ts.get_daily(symbol='AAPL', outputsize='full')
 
 # Insert into DB
