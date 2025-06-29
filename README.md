@@ -20,6 +20,11 @@ This project demonstrates an end-to-end data pipeline for historical S&P 500 sto
 
 ---
 
+## Architecture Overview
+
+![System Architecture](assets/architecture.png)
+
+
 ## 📁 Folder Structure
 
 ```bash
