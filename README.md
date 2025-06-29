@@ -53,32 +53,22 @@ stock-forecasting-aws/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+---
+
 ⚙️ Setup Instructions
 1. Clone the Repository
-bash
-Copy
-Edit
 git clone https://github.com/Nasrullah-chandio/stock-forecasting-aws.git
 cd stock-forecasting-aws
 2. Create and Activate a Python Virtual Environment
-bash
-Copy
-Edit
 python3 -m venv venv
 source venv/bin/activate      # macOS/Linux
 # OR
 venv\Scripts\activate         # Windows
 3. Install Python Dependencies
-bash
-Copy
-Edit
 pip install -r requirements.txt
 4. Add Environment Variables
 Create a .env file at the root level:
 
-ini
-Copy
-Edit
 DB_HOST=your-rds-endpoint
 DB_NAME=stocks
 DB_USER=pgadmin
@@ -90,9 +80,6 @@ ALPHA_VANTAGE_API_KEY=your_api_key
 ☁️ Terraform Infrastructure Deployment (Optional)
 If you want to deploy the AWS infra from scratch:
 
-bash
-Copy
-Edit
 cd stock-forecast-infra
 
 # Initialize Terraform
@@ -105,23 +92,14 @@ terraform plan
 terraform apply
 Ensure terraform.tfvars file is created with:
 
-hcl
-Copy
-Edit
 aws_region = "us-east-1"
 🧠 Usage Workflow
 Run Flask Server:
 
-bash
-Copy
-Edit
 cd flask-server
 python app.py
 Fetch Historical Data:
 
-bash
-Copy
-Edit
 cd stock-app
 python fetch_sp500_history.py
 Schedule Daily Update:
