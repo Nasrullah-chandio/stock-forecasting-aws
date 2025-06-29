@@ -1,46 +1,18 @@
-<<<<<<< HEAD
+
+# macOS system files
+.DS_Store
+
+# Python environment & cache
+.env
+__pycache__/
+*.pyc
+
+# Terraform state and lock files
 .terraform/
 *.tfstate
 *.tfstate.backup
 .terraform.lock.hcl
 *.log
-=======
-# macOS system files
-.DS_Store
 
-# Python virtual environments
-venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Environment config
-.env
-
-# Jupyter notebook checkpoints (if used later)
-.ipynb_checkpoints/
-
-# VSCode settings (optional)
+# IDE/editor junk
 .vscode/
-
-# Terraform local state and cache
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-*.backup
-.terraform.lock.hcl
-
-# Logs
-*.log
-
-# Frontend build artifacts (if you compile later)
-dist/
-build/
-node_modules/
-
-# Flask cache
-instance/
-*.db
->>>>>>> feature/historical-sp500-load
